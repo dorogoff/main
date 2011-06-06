@@ -18,15 +18,19 @@
 
 #include <fstream>
 
+#include "mfunctions.h"
+
 #define printf pspDebugScreenPrintf 
 #define PORT 5555
-#define SERVER_IP "192.168.1.8"
+#define SERVER_IP "192.168.1.4"
 
 int memAddr=0x0000;	// 2 bytes
 
 void timer();
 
 int create_socket(void);
+
+
 int flagNo;	// номер того что изменяем
 
 char comm; // команда
@@ -237,6 +241,7 @@ int create_socket()
 	char buffer[1024];
 	unsigned int echolen;
 	int received = 0;
+	int snd_flag=0;		// флаг для контроля отправки данных
 
 	char buf;
 	char send_byte[]={27, '\0'};
@@ -254,7 +259,7 @@ int create_socket()
 	/* Construct the server sockaddr_in structure */
 	memset(&echoserver, 0, sizeof(echoserver));       /* Clear struct */
 	echoserver.sin_family = AF_INET;                  /* Internet/IP */
-	echoserver.sin_addr.s_addr = inet_addr("192.168.1.8");  /* IP address */
+	echoserver.sin_addr.s_addr = inet_addr(SERVER_IP);  /* IP address */
 	echoserver.sin_port = htons(5555);       /* server port */
 	/* Establish connection */
 	if (connect(sock, (struct sockaddr *) &echoserver,
@@ -266,9 +271,6 @@ int create_socket()
 
 	char esc=27, hiAddr=0x00, loAddr=0x00;
 
-	/////////////////////////////////////////////////
-	// Если отправка команды на чтение
-	
 	// Разделим адрес на старший и младший
 	hiAddr = memAddr / 0x100;
 	loAddr = memAddr % 0x100;
@@ -281,16 +283,32 @@ int create_socket()
 	recv(sock, &buf, 1, 0);
 	printf("\nReceive: %X", buf);
 
-	// send hiAddr
-	send(sock, &hiAddr, 1, 0);
-	// send loAddr
-	send(sock, &loAddr, 1, 0);
 	// send Command
-	send(sock, &comm, 1, 0);
+	snd_flag=send(sock, &comm, 1, 0);
+	// send hiAddr
+	snd_flag=send(sock, &hiAddr, 1, 0);
+	// send loAddr
+	snd_flag=send(sock, &loAddr, 1, 0);
+	// если это команда записи, то отправим данные
+	if (comm==writeMem or comm==writeRam) {
+		snd_flag=send(sock, &data, 1, 0);
+	// если команда чтения, то примем данные
+	} else if (comm==readMem or comm==readRam) {
+		snd_flag=recv(sock, &buf, 1, 0);
+	// значит команда старта ??? что отправлять, адрес откуда стартовать?
+	} else {
+		snd_flag=send(sock, &data, 1, 0);
+	}
+	// проверка на отправку
+	if (!snd_flag) {
+		printf("\n [Error] When send bytes");
+	}
+
+
 	// receive info
 	recv(sock, &buf, 1, 0);
 	printf("\nReceive: %X", buf);
-	/////////////////////////////////////////////////
+	
 
 
 
@@ -323,7 +341,16 @@ int pad_thread(SceSize args, void *argp){
 					flagNo++;
 				}
 				timer();
+				timer();
 			}
+
+			// считывание карты
+			if (pad.Buttons & PSP_CTRL_RTRIGGER) {
+				getLocalMap();
+				timer();
+				timer();
+			}
+
 			// отправка данных по сети
 			if (pad.Buttons & PSP_CTRL_CROSS) {
 				printf("\nCross button pressed");
