@@ -20,10 +20,7 @@
 
 #define printf pspDebugScreenPrintf 
 #define PORT 5555
-<<<<<<< HEAD
 #define SERVER_IP "192.168.1.8"
-=======
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
 
 int memAddr=0x0000;	// 2 bytes
 
@@ -31,11 +28,9 @@ void timer();
 
 int create_socket(void);
 int flagNo;	// номер того что изменяем
-<<<<<<< HEAD
+
 char comm; // команда
-=======
-char comm; // команд
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
+
 char data; // что отправляем
 int flagCommand;
 
@@ -91,6 +86,7 @@ void changeWrValue(int comm) {
 	}
 }
 // требуется для плавного инкремента и декремента значений
+
 void timer() {
 	int z=0;
 	while(z<1500000) {
@@ -180,13 +176,11 @@ char *getconfname(int confnum) {
 
 int net_thread(SceSize args, void *argp) 
 { 
-<<<<<<< HEAD
+
 	int selComponent = 2; 
-=======
-  int selComponent = 2; 
   
   printf("Using connection %d (%s) to connect...\n", selComponent, getconfname(selComponent)); 
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
+
 
   if (connect_to_apctl(selComponent)) 
   { 
@@ -238,7 +232,7 @@ int create_socket()
 {
 
 	int sock;
-<<<<<<< HEAD
+
 	struct sockaddr_in echoserver;
 	char buffer[1024];
 	unsigned int echolen;
@@ -304,86 +298,6 @@ int create_socket()
 
 	close(sock);
 	return 0;
-=======
-            struct sockaddr_in echoserver;
-            char buffer[1024];
-            unsigned int echolen;
-            int received = 0;
-			char buf[1];
-			char send_byte[]={27, '\0'};
-			char snd[1];
-
-			char recv_byte[1];
-
-            /* Create the TCP socket */
-            if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-              printf("Failed to create socket");
-            }
-
-			/* Construct the server sockaddr_in structure */
-            memset(&echoserver, 0, sizeof(echoserver));       /* Clear struct */
-            echoserver.sin_family = AF_INET;                  /* Internet/IP */
-            echoserver.sin_addr.s_addr = inet_addr("192.168.1.4");  /* IP address */
-            echoserver.sin_port = htons(5555);       /* server port */
-            /* Establish connection */
-            if (connect(sock,                (struct sockaddr *) &echoserver,
-                        sizeof(echoserver)) < 0) {
-              printf("Failed to connect with server");
-            } else {
-				printf("\nSocket created");
-			}
-
-			// init
-            if (send(sock, "\x27", 1, 0)==0) {
-              printf("Mismatch in number of sent bytes");
-            } else {
-				printf("Message sended");
-			}
-
-            /* Receive the word back from the server */
-			// it must be  #80h
-			recv(sock,buf,1,0);
-            printf("\nReceived: ");
-			printf("%X", buf);
-			
-			// main loop
-			int hiAddr, loAddr, comm;
-			hiAddr=0x00;
-			loAddr=0x00;
-			int j=0;
-				sprintf(snd, "%X",comm);
-			//while(j<128) {
-				
-				// send command
-				send(sock, send_byte, 1,0);
-				// send hi address
-				sprintf(snd, "%X",hiAddr);
-				send(sock, send_byte, 1,0);
-				//send lo address
-				sprintf(snd, "%X",loAddr);
-				send(sock, send_byte, 1,0);
-				//receive byte
-				recv(sock, recv_byte,1,0);
-				//print this received byte on screen
-				printf("\nRCV: %X", recv_byte);
-				// increment lo address
-				loAddr++;
-				j++;
-			//}
-
-			//printf("\nMessage from serer: %s" , buffer);
-
-				/*
-
-				ofstream out;
-				out.("file.type");
-				if (in==NULL) return 0;
-				in<<"this string was wrote to file by c++;)"<<endl;
-
-				*/
-				close(sock);
-	 return 0;
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
 
 }
 
@@ -396,15 +310,7 @@ int pad_thread(SceSize args, void *argp){
 	while (1)
 	{
 		sceCtrlReadBufferPositive(&pad, 1);
-<<<<<<< HEAD
 
-		if (pad.Buttons != 0){
-
-			// обработка флага, определяем что будем инкрементировать
-			// выбор функции
-			if (pad.Buttons & PSP_CTRL_LTRIGGER) {
-				if (flagNo==2) {
-=======
 		
 		if (pad.Buttons != 0){
 			
@@ -412,18 +318,11 @@ int pad_thread(SceSize args, void *argp){
 			// выбор функции
 			if (pad.Buttons & PSP_CTRL_LTRIGGER) {
 				if (flagNo==3) {
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
 					flagNo=0;
 				} else {
 					flagNo++;
 				}
 				timer();
-<<<<<<< HEAD
-				timer();
-
-=======
-				
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
 			}
 			// отправка данных по сети
 			if (pad.Buttons & PSP_CTRL_CROSS) {
@@ -450,22 +349,16 @@ int pad_thread(SceSize args, void *argp){
 				//printf("%X \n", recv);
 
 				switch(flagNo) {
-<<<<<<< HEAD
 				case 0: changeAddr(1);break;
 				case 1: changeComm(1);break;
 				case 2: changeWrValue(1);break;
 				default: changeAddr(1);break;
-=======
-					case 0: changeAddr(1);break;
-					case 1: changeComm(1);break;
-					case 2: changeWrValue(1);break;
-					default: changeAddr(1);break;
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
+
 				}
 
 				timer();
 			}
-<<<<<<< HEAD
+
 
 			// декремент
 			if (pad.Buttons & PSP_CTRL_DOWN) {
@@ -478,20 +371,6 @@ int pad_thread(SceSize args, void *argp){
 				printf("Command:");
 				printf("%X \n", comm);
 
-=======
-
-			// декремент
-			if (pad.Buttons & PSP_CTRL_DOWN) {
-				pspDebugScreenClear();
-				printf("flagNo %d \n", flagNo);
-
-				printf("Memory address:");
-				printf("%X \n", memAddr);
-
-				printf("Command:");
-				printf("%X \n", comm);
-
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
 				printf("Data:");
 				printf("%X \n", data);
 
@@ -499,17 +378,12 @@ int pad_thread(SceSize args, void *argp){
 				//printf("%X \n", recv);
 
 				switch(flagNo) {
-<<<<<<< HEAD
+
 				case 0: changeAddr(0);break;
 				case 1: changeComm(0);break;
 				case 2: changeWrValue(0);break;
 				default: changeAddr(0);break;
-=======
-					case 0: changeAddr(0);break;
-					case 1: changeComm(0);break;
-					case 2: changeWrValue(0);break;
-					default: changeAddr(0);break;
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
+
 				}
 				timer();
 			}
@@ -545,52 +419,22 @@ int main(int argc, char **argv)
 	  printf("\nNet Thread created\n");
   }
 
-<<<<<<< HEAD
-	if (thid < 0) { 
-		printf("Error! Thread could not be created!\n"); 
-		sceKernelSleepThread(); 
-	} else {
-		printf("\nNet Thread created\n");
-	}
-=======
   // create socket and send bytes by triangle
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
 
-  th_pad = sceKernelCreateThread("pad_thread", pad_thread, 0x19, 0x10000, PSP_THREAD_ATTR_USER, NULL);
-  if (th_pad < 0) { 
-	  printf("Error! Thread listen pad not created\n"); 
-	  sceKernelSleepThread(); 
-  } else {
-	  printf("\nPad Thread created \n");
-	  
-  }
-
-<<<<<<< HEAD
 	th_pad = sceKernelCreateThread("pad_thread", pad_thread, 0x19, 0x10000, PSP_THREAD_ATTR_USER, NULL);
 	if (th_pad < 0) { 
 		printf("Error! Thread listen pad not created\n"); 
 		sceKernelSleepThread(); 
 	} else {
 		printf("\nPad Thread created \n");
-=======
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
+	}
 
   
 
   
 
-<<<<<<< HEAD
-
-
-
-
-
-	sceKernelStartThread(thid, 0, NULL); 
-	sceKernelStartThread(th_pad, 0, 0);
-=======
   sceKernelStartThread(thid, 0, NULL); 
   sceKernelStartThread(th_pad, 0, 0);
->>>>>>> 49a75ba0fc52225dea72bd49d49e33772c5cc8ba
 
   sceKernelExitDeleteThread(0); 
 
